@@ -1,7 +1,8 @@
 var config = require('./config.js');
 var net = require('net');
-/* Set up web server */
+var mod_ctype = require('ctype')
 
+/* Set up web server */
 var express = require('express'),
     WebSocketServer = require('ws').Server,
     wss = new WebSocketServer({port: config.wsPort}),
@@ -26,11 +27,25 @@ app.get('/style.css', function (req, res) {
 app.listen(config.httpPort);
 
 
+var parser = new mod_ctype.Parser({ endian: 'little' });
+parser.typedef('worm_t', [
+    { direction: { type: 'float' } },
+    { alive: { type: 'float' } }
+]);
+
 /**
  *  Setup TCP-Socket
  */
 
-var server = net.createServer();
+var server = net.createServer(function(sock){
+    sock.on('data', function(data){
+        var out = parser.readData([ { worm: { type: 'worm_t[1]' } } ], data, 0);
+        console.log("DATA:");
+        console.log(data);
+        console.log("Parsed:");
+        console.log(out);
+    });
+});
 //to be able to reach socket when clients send colors
 var reportSocket;
 //Start listening
@@ -48,7 +63,6 @@ server.on('close', function(data){
     //start to listen again
     this.listen(config.reportPort, config.reportHost);
 });
-
 /*
  * Set up WebSocket Server
  */
@@ -94,7 +108,7 @@ wss.on('connection', function(ws) {
     ws.on('close', function(ws) {
         sockets[socketId] = null;
     });
-});
+})  ;
 
 /*
 * Generate new color

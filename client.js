@@ -3,13 +3,13 @@
 */
 
 $(document).ready(function() {
-    
+
     if (typeof WebSocket !== 'function') {
         pln("Your browser does not support websockets");
         return;
     }
- 
-    var ws = new WebSocket("ws://" + config.hostName + ":" + config.wsPort);
+
+    var ws = new WebSocket("ws://127.0.0.1:" + config.wsPort);
 
     ws.onopen = function () {
         pln('Websocket connection established!');
