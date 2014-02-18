@@ -1,7 +1,6 @@
 /*
-* Document ready
+* Client executes this when Document ready
 */
-
 $(document).ready(function() {
 
     if (typeof WebSocket !== 'function') {
@@ -9,8 +8,13 @@ $(document).ready(function() {
         return;
     }
 
-    var ws = new WebSocket("ws://127.0.0.1:" + config.wsPort);
+    //Create websocket
+    //Obs. Jag har ändrat så att WebSocketten kopplar upp sig mot 
+    //min privata IP-adress. Detta gör att andra datorer kan kommunicera 
+    //till servern via websockets
+    var ws = new WebSocket("ws://130.236.124.78:" + config.wsPort);
 
+    //When websocket is open, do this
     ws.onopen = function () {
         pln('Websocket connection established!');
         $('#state').html('');
